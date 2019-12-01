@@ -47,6 +47,8 @@ AWeaponGravityGun::AWeaponGravityGun()
 	ImpulseForceWhenShootingTarget = 5000;
 
 	bIsHeldByPlayer = false;
+
+	
 }
 
 void AWeaponGravityGun::Tick(float DeltaTime)
@@ -67,7 +69,7 @@ void AWeaponGravityGun::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
+	bIsAttachedObject = false;
 }
 
 void AWeaponGravityGun::Fire()
@@ -75,11 +77,7 @@ void AWeaponGravityGun::Fire()
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Fire"));
 
 	//If the object is attached, shoot it away. Else detect if an object is in range
-	if (bIsAttachedObject)
-	{
-		DetachObject();
-	}
-
+	DetachObject();
 	//Apply Impulse to object identified by the raycast
 	if (AttachedObject)
 	{
@@ -158,17 +156,18 @@ void AWeaponGravityGun::FindObjects()
 		USceneComponent* Pickup = RaycastHit.GetActor()->GetRootComponent();
 
 		//Checking if the component is simulating physics
-		
 		if (Pickup->IsSimulatingPhysics())
 		{
 			GEngine->AddOnScreenDebugMessage(key, 2.0f, FColor::Yellow, TEXT("Found item to pick up"));
 			AttachedObject = Pickup; //We attach it to our gun
 		}
+		//Makes sure that we don't attach an object when we aren't looking at it
+		//Keeps it attached if we already attached it
+		else if(!Pickup->IsSimulatingPhysics() && !bIsAttachedObject)
+		{
+			AttachedObject = nullptr;
+		}
 	}
-
-	//Getting the root component of the actor
-	
-	
 }
 
 void AWeaponGravityGun::DetachObject()
