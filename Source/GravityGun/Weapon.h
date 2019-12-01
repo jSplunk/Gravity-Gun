@@ -23,6 +23,14 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon();
 
+	FORCEINLINE class USoundCue* GetFireSound() { return FireSound; }
+
+	FORCEINLINE class USoundCue* GetSecondaryFireSound() { return SecondaryFireSound; }
+
+	FORCEINLINE void SetFireSound(USoundCue* Sound) { FireSound = Sound; }
+
+	FORCEINLINE void SetSecondaryFireSound(USoundCue* Sound) { SecondaryFireSound = Sound; }
+
 protected:
 	
 	/*
@@ -38,17 +46,19 @@ protected:
 
 	// Sound to play each time we fire
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	class USoundBase* FireSound;
+	class USoundCue* FireSound;
 
 	// Sound to play each time we use secondary fire 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	class USoundBase* SecondaryFireSound;
+	class USoundCue* SecondaryFireSound;
 
 	//Location on gun mesh where the items are pulled towards
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (DisplayName = "Weapon Muzzle"))
 	class USceneComponent* MuzzleLocation;
 
 public:
+
+	
 
 	/*
 		Public virtual functions for inherited classes

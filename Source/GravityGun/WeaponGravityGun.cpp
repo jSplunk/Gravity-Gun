@@ -5,10 +5,12 @@
 #include "CollisionQueryParams.h"
 #include "GameFramework/Actor.h"
 #include "Engine/Engine.h"
+#include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/ActorComponent.h"
 #include "GravityGunCameraShake.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -19,8 +21,13 @@ AWeaponGravityGun::AWeaponGravityGun()
 {
 	//Create a gun mesh component
 	GetCapsuleCollider()->InitCapsuleSize(20.f, 40.0f);
-	GetCapsuleCollider()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-	GetCapsuleCollider()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetCapsuleCollider()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleCollider()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetCapsuleCollider()->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
+	GetCapsuleCollider()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetCapsuleCollider()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleCollider()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	GetCapsuleCollider()->SetSimulatePhysics(true);
 
 	GetInventoryItemSkeletalMesh()->bCastDynamicShadow = false;
 	GetInventoryItemSkeletalMesh()->CastShadow = false;
@@ -31,6 +38,12 @@ AWeaponGravityGun::AWeaponGravityGun()
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->SetupAttachment(GetInventoryItemSkeletalMesh());
 	MuzzleLocation->SetRelativeLocation(FVector(0, 400.0f, 10.0f));
+
+	//Sets the sound cues
+	static ConstructorHelpers::FObjectFinder<USoundCue> FireSound(TEXT("SoundCue'/Game/Sounds/FireGravityGun.FireGravityGun'"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> SecondaryFireSound(TEXT("SoundCue'/Game/Sounds/SecondaryFireGravityGun.SecondaryFireGravityGun'"));
+	SetFireSound(FireSound.Object);
+	SetSecondaryFireSound(SecondaryFireSound.Object);
 
 	//Creating physics handle
 	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));

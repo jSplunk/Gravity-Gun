@@ -5,8 +5,10 @@
 #include "Camera/CameraComponent.h"
 #include "Weapon.h"
 #include "WeaponGravityGun.h"
+#include "Sound/SoundCue.h"
 #include "GameFramework/Actor.h"
 #include "Components/PrimitiveComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "InventoryCharacter.h"
 #include "Engine/Engine.h"
 #include "DrawDebugHelpers.h"
@@ -85,14 +87,6 @@ void AInventory::DropEquippedItem(AActor* Player)
 			{
 				//Spawning our pickup
 				AWeaponGravityGun* PickupToSpawn = GetWorld()->SpawnActor<AWeaponGravityGun>(EquippedItem->GetClass(), Transform, SpawnParams);
-
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToAllChannels(ECR_Ignore);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetSimulatePhysics(true);
 				
 
 				if (PickupToSpawn)
@@ -109,14 +103,6 @@ void AInventory::DropEquippedItem(AActor* Player)
 				//Spawning our pickup
 				AWeapon* PickupToSpawn = GetWorld()->SpawnActor<AWeapon>(EquippedItem->GetClass(), Transform, SpawnParams);
 
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToAllChannels(ECR_Ignore);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetSimulatePhysics(true);
-
 				if (PickupToSpawn)
 				{
 					//Unreference the item we've just placed
@@ -130,14 +116,6 @@ void AInventory::DropEquippedItem(AActor* Player)
 			{
 				//Spawning our pickup
 				AInventoryItem* PickupToSpawn = GetWorld()->SpawnActor<AInventoryItem>(EquippedItem->GetClass(), Transform, SpawnParams);
-
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToAllChannels(ECR_Ignore);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
-				Cast<UPrimitiveComponent>(PickupToSpawn->GetRootComponent())->SetSimulatePhysics(true);
 
 				if (PickupToSpawn)
 				{
