@@ -6,6 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "InventoryItem.generated.h"
 
+/*
+ *
+ *	Base class for all items that can be picked up by the inventory
+ *
+ */
+
+
 UCLASS()
 class GRAVITYGUN_API AInventoryItem : public AActor
 {

@@ -25,6 +25,9 @@ public:
 
 protected:
 	
+	/*
+		Protected properties of the weapon
+	*/
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,11 +36,24 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (DisplayName = "Weapon Offset"))
 	FVector GunOffset;
 
+	// Sound to play each time we fire
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class USoundBase* FireSound;
+
+	// Sound to play each time we use secondary fire 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class USoundBase* SecondaryFireSound;
+
 	//Location on gun mesh where the items are pulled towards
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (DisplayName = "Weapon Muzzle"))
 	class USceneComponent* MuzzleLocation;
 
-public:	
+public:
+
+	/*
+		Public virtual functions for inherited classes
+	*/
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

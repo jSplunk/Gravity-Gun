@@ -5,6 +5,7 @@
 #include "CollisionQueryParams.h"
 #include "GameFramework/Actor.h"
 #include "Engine/Engine.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/ActorComponent.h"
 #include "GravityGunCameraShake.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -91,7 +92,14 @@ void AWeaponGravityGun::Fire()
 		AttachedObject = nullptr;
 	}
 
-	//Spawn particle effect and sound at location
+	// try and play the sound if specified
+	if (FireSound != NULL)
+	{
+		//This work is licensed under a Creative Commons Attribution 3.0 Unported License.
+		//https://freesound.org/s/196907/
+		//Sound by Dpoggioli on Freesound.org
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
 }
 
 void AWeaponGravityGun::SecondaryFire()
@@ -105,6 +113,15 @@ void AWeaponGravityGun::SecondaryFire()
 	}
 	else if (AttachedObject)
 	{
+		// try and play the sound if specified
+		if (SecondaryFireSound != NULL)
+		{
+			//This work is licensed under a Creative Commons Attribution 3.0 Unported License.
+			//https://freesound.org/s/51465/
+			//Sound by smcameron on Freesound.org
+			UGameplayStatics::PlaySoundAtLocation(this, SecondaryFireSound, GetActorLocation());
+		}
+
 		//Checking if the component is in range for pick up
 		if (GetDistanceTo(AttachedObject->GetOwner()) > AttachRange)
 		{

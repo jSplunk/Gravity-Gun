@@ -8,7 +8,7 @@
 #include "InventoryItemUserWidget.generated.h"
 
 /**
- * 
+ * Used as widget base class for displaying inventory items
  */
 UCLASS()
 class GRAVITYGUN_API UInventoryItemUserWidget : public UUserWidget

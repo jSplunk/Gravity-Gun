@@ -75,6 +75,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 	class AInventory* CharacterInventory;
 
+	// AnimMontage to play each time we fire
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class UAnimMontage* FireAnimation;
+
 	/*
 		Non-visible blueprint functions	
 	*/

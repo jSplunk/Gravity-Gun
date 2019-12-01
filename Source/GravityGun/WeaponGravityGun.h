@@ -58,6 +58,11 @@ protected:
 	TSubclassOf<class UCameraShake> Shake;
 
 public:
+
+	/*
+		Public virtual functions for inherited classes
+	*/
+
 	//Called every frame
 	virtual void Tick(float DeltaTime) override;
 

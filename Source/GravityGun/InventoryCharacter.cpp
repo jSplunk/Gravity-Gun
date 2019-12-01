@@ -121,7 +121,20 @@ void AInventoryCharacter::Fire()
 {
 	//Checks to see if there is an item equipped by the inventory
 	if (CharacterInventory->GetEquippedItem())
+	{
 		Cast<AWeapon>(CharacterInventory->GetEquippedItem())->Fire();
+
+		// try and play a firing animation if specified
+		if (FireAnimation != NULL)
+		{
+			// Get the animation object for the arms mesh
+			UAnimInstance* AnimInstance = Char->GetAnimInstance();
+			if (AnimInstance != NULL)
+			{
+				AnimInstance->Montage_Play(FireAnimation, 1.f);
+			}
+		}
+	}
 }
 
 void AInventoryCharacter::SecondaryFire()
