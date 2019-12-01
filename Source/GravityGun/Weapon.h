@@ -8,6 +8,12 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogWeapon, Log, All);
 
+/*
+ *
+ *	Abstract weapon class inherited from inventory items
+ *
+ */
+
 UCLASS()
 class GRAVITYGUN_API AWeapon : public AInventoryItem
 {
@@ -18,6 +24,8 @@ public:
 	AWeapon();
 
 protected:
+	
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

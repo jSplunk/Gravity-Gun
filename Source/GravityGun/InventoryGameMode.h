@@ -7,7 +7,7 @@
 #include "InventoryGameMode.generated.h"
 
 /**
- * 
+ * Used as a game mode for supplying default pawn class
  */
 UCLASS()
 class GRAVITYGUN_API AInventoryGameMode : public AGameModeBase

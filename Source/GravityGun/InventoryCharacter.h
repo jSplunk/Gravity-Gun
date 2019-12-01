@@ -18,10 +18,12 @@ class GRAVITYGUN_API AInventoryCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-private:
-	bool bIsHiddenMesh;
-
 public:
+
+	/*
+		Public class specific functions
+	*/
+
 	// Sets default values for this character's properties
 	AInventoryCharacter();
 
@@ -33,17 +35,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void DropInventoryItem();
 
+	//Used to get the inventory from the player
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FORCEINLINE AInventory* GetCharacterInventory() { return CharacterInventory; }
 
 	UFUNCTION(BlueprintCallable, Category = Camera)
 	FORCEINLINE UCameraComponent* GetCharacterCamera() { return FirstPersonCamera; }
 
-	/*Handles the Inventory Input by sending information to the controller*/
-	UFUNCTION()
-	void HandleInventoryInput();
-
 protected:
+
+	/*
+		Protected properties of the character
+	*/
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -59,6 +63,10 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USkeletalMeshComponent* Char;
 
+	//Flag that gets set when the mesh is hidden
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Mesh)
+	bool bIsHiddenMesh;
+
 	//Camera for First Person perspective view
 	UPROPERTY(VisibleDefaultsOnly, Category = Camera)
 	class UCameraComponent* FirstPersonCamera;
@@ -66,6 +74,10 @@ protected:
 	//Inventory actor reference
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 	class AInventory* CharacterInventory;
+
+	/*
+		Non-visible blueprint functions	
+	*/
 
 	//Handles moving forward/backward
 	void MoveForward(float Val);
@@ -89,7 +101,12 @@ protected:
 	void Fire();
 	void SecondaryFire();
 
-public:	
+public:
+
+	/*
+		Public overridden or dynamic functions
+	*/
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -97,9 +114,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	//Used for picking up inventory items
-	UFUNCTION()
+	UFUNCTION(Category = "Overlapping Event")
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	/*virtual void OnEndOverap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);*/
 
 };

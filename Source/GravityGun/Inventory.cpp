@@ -101,6 +101,7 @@ void AInventory::DropEquippedItem(AActor* Player)
 					Inventory[IndexOfItem] = nullptr;
 					LatestAvailablePositionInInventory--;
 					EquippedItem->Destroy();
+					EquippedItem = nullptr;
 				}
 			}
 			else if (EquippedItem->IsA<AWeapon>())
@@ -122,6 +123,7 @@ void AInventory::DropEquippedItem(AActor* Player)
 					Inventory[IndexOfItem] = nullptr;
 					LatestAvailablePositionInInventory--;
 					EquippedItem->Destroy();
+					EquippedItem = nullptr;
 				}
 			}
 			else
@@ -143,6 +145,7 @@ void AInventory::DropEquippedItem(AActor* Player)
 					Inventory[IndexOfItem] = nullptr;
 					LatestAvailablePositionInInventory--;
 					EquippedItem->Destroy();
+					EquippedItem = nullptr;
 				}
 			}
 

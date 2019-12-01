@@ -7,31 +7,13 @@
 #include "InventoryPlayerController.generated.h"
 
 /**
- * 
+ * Player controller used for the InventoryCharacter
  */
 UCLASS()
 class GRAVITYGUN_API AInventoryPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
-private:
-	/*InventoryWidget reference*/
-	class UInventoryUserWidget* InventoryWidgetRef;
-
-	/*True if the inventory is currently open - false otherwise*/
-	bool bIsInventoryOpen;
-
-protected:
-
-	/*InventoryWidget Blueprint reference*/
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UInventoryUserWidget> InventoryWidgetBP;
-
-public:
-	virtual void Possess(APawn* InPawn) override;
-
-	/*Opens or closes the inventory*/
-	void HandleInventoryInput();
 	
 	
 };

@@ -9,7 +9,9 @@
 /**
  * This is an implementation of a gravity gun which allows you to pull items towards you.
  * Shoot them away from you, both while holding them and while they are on the ground.
- * Works only on actors with "Simulate Physics" enabled, and 
+ *
+ * Works only on actors with "Simulate Physics" enabled, and when they are blocking the Camera
+ * collision channel.
  */
 
 UCLASS()
@@ -21,8 +23,6 @@ class GRAVITYGUN_API AWeaponGravityGun : public AWeapon
 public:
 	//Default contructor
 	AWeaponGravityGun();
-
-	bool bIsHeldByPlayer;
 
 protected:
 
@@ -49,13 +49,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attached Object")
 	bool bIsAttachedObject;
 
+	//Flag which checks when the gun is held by a player
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attached Object")
+	bool bIsHeldByPlayer;
+
+	//Reference to a camera shake object
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UCameraShake> Shake;
 
 public:
-	// Called every frame
+	//Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//Called before Tick
 	virtual void BeginPlay() override;
 
 	//Overridden function from parent class, primary fire method
@@ -74,6 +80,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Detach Object")
 	virtual void DetachObject();
 
+	//Setup specific properties when spawning a new gravity gun
 	UFUNCTION(BlueprintCallable, Category = "Gravity Gun")
 	virtual void SetPickupProperties() override;
 };

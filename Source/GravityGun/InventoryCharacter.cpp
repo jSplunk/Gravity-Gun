@@ -19,26 +19,26 @@
 // Sets default values
 AInventoryCharacter::AInventoryCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Set size for collision capsule
+	//Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AInventoryCharacter::OnBeginOverlap);
 
-	// set our turn rates for input
+	//Set our turn rates for input
 	BaseTurnRate = 45.0f;
 	BaseLookUpRate = 45.0f;
 
-	// Create a CameraComponent	
+	//Create a CameraComponent
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCamera->RelativeLocation = FVector(-39.56f, 1.75f, 64.f); // Position the camera
 	FirstPersonCamera->bUsePawnControlRotation = true;
 
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
+	//Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Char = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Character"));
 	Char->SetupAttachment(FirstPersonCamera);
 	Char->bCastDynamicShadow = false;
@@ -54,24 +54,29 @@ void AInventoryCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Hide the mesh, so it doesn't look like the character is holding nothing
 	Char->SetHiddenInGame(true);
 	bIsHiddenMesh = true;
-	CharacterInventory->SetCamera(FirstPersonCamera);
 
-	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	//GravityGun->AttachToComponent(Char, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-	//GravityGun->GetInventoryItemSkeletalMesh()->AttachToComponent(Char, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	//Sending the camera to the inventory which uses it for raycasting
+	CharacterInventory->SetCamera(FirstPersonCamera);
 }
 
 void AInventoryCharacter::PickUpInventoryItem()
 {
 	CharacterInventory->PickupItem();
-	if (CharacterInventory->LastItemSeen)
+	if (CharacterInventory->GetLastItemSeen())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Gun Here!"));
+
 		//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 		Cast<AWeapon>(CharacterInventory->GetEquippedItem())->AttachToComponent(Char, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+		
+		//Setting specific properties for picking up a weapon, function is overridden in every Weapon instance
 		Cast<AWeapon>(CharacterInventory->GetEquippedItem())->SetPickupProperties();
+
+		//Setting the flag to false, since we are showing the mesh again
+		bIsHiddenMesh = false;
 	}
 }
 
@@ -81,13 +86,6 @@ void AInventoryCharacter::DropInventoryItem()
 	Char->SetHiddenInGame(true);
 	bIsHiddenMesh = true;
 }
-
-void AInventoryCharacter::HandleInventoryInput()
-{
-	AInventoryPlayerController* Con = Cast<AInventoryPlayerController>(GetController());
-	if (Con) Con->HandleInventoryInput();
-}
-
 
 void AInventoryCharacter::MoveForward(float Val)
 {
@@ -121,12 +119,14 @@ void AInventoryCharacter::LookUpAtRate(float Rate)
 
 void AInventoryCharacter::Fire()
 {
+	//Checks to see if there is an item equipped by the inventory
 	if (CharacterInventory->GetEquippedItem())
 		Cast<AWeapon>(CharacterInventory->GetEquippedItem())->Fire();
 }
 
 void AInventoryCharacter::SecondaryFire()
 {
+	//Checks to see if there is an item equipped by the inventory
 	if(CharacterInventory->GetEquippedItem())
 		Cast<AWeapon>(CharacterInventory->GetEquippedItem())->SecondaryFire();
 }
@@ -136,13 +136,8 @@ void AInventoryCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Calling the raycast from the player's tick, so we can pass in the player to be ignored by the parameters
 	if (CharacterInventory) CharacterInventory->Raycast(this);
-
-	if (!CharacterInventory->GetEquippedItem() && bIsHiddenMesh)
-	{
-		Char->SetHiddenInGame(true);
-		bIsHiddenMesh = true;
-	}
 }
 
 // Called to bind functionality to input
@@ -167,9 +162,6 @@ void AInventoryCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	//Pick up an item for inventory
 	PlayerInputComponent->BindAction("PickUpItem", IE_Pressed, this, &AInventoryCharacter::PickUpInventoryItem);
 
-	//Action mapping for open inventory
-	PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &AInventoryCharacter::HandleInventoryInput);
-
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &AInventoryCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AInventoryCharacter::MoveRight);
@@ -188,47 +180,49 @@ void AInventoryCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AA
 {
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
 	{
+		
+		/*
+		
+			Not using OnComponentOverlap, but can also be used to pick up the gun if needed.
+		
+		*/
+
 		//If the overlapped item is a weapon
-		if(OtherActor->IsA<AWeapon>())
-		{
-			//Enable the skeletal mesh for the character
-			Char->SetHiddenInGame(false);
-			bIsHiddenMesh = false;
+		//if(OtherActor->IsA<AWeapon>())
+		//{
+		//	//Enable the skeletal mesh for the character
+		//	Char->SetHiddenInGame(false);
+		//	bIsHiddenMesh = false;
 
-			//Cast to item so we can store the actor as an inventory item
-			AInventoryItem* Item = Cast<AInventoryItem>(OtherActor);
+		//	//Cast to item so we can store the actor as an inventory item
+		//	AInventoryItem* Item = Cast<AInventoryItem>(OtherActor);
 
-			//Sets the last seen item to the one we found
-			CharacterInventory->LastItemSeen = Item;
+		//	//Sets the last seen item to the one we found
+		//	CharacterInventory->LastItemSeen = Item;
 
-			//Picking up the item to the inventory
-			PickUpInventoryItem();
+		//	//Picking up the item to the inventory
+		//	PickUpInventoryItem();
 
-			//When we equip the weaopn, it needs to be adjusted booth location and rotation, and also disable physics
-			//Needs to be changed if there are multiple guns, since their adjustements are diffrent
-			//Would need to incorporate another property of the gun
+		//	//When we equip the weaopn, it needs to be adjusted booth location and rotation, and also disable physics
+		//	//Needs to be changed if there are multiple guns, since their adjustements are diffrent
+		//	//Would need to incorporate another property of the gun
 
-			if (CharacterInventory->LastItemSeen)
-			{
-				Cast<AWeapon>(CharacterInventory->GetEquippedItem())->SetPickupProperties();
+		//	if (CharacterInventory->LastItemSeen)
+		//	{
+		//		Cast<AWeapon>(CharacterInventory->GetEquippedItem())->SetPickupProperties();
 
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Gun Here!"));
-				//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-				Cast<AWeapon>(CharacterInventory->GetEquippedItem())->AttachToComponent(Char, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-			}
-		}
-		else if(OtherActor->IsA<AInventoryItem>())
-		{
-			AInventoryItem* Item = Cast<AInventoryItem>(OtherActor);
+		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Gun Here!"));
+		//		//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
+		//		Cast<AWeapon>(CharacterInventory->GetEquippedItem())->AttachToComponent(Char, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+		//	}
+		//}
+		//else if(OtherActor->IsA<AInventoryItem>())
+		//{
+		//	AInventoryItem* Item = Cast<AInventoryItem>(OtherActor);
 
-			CharacterInventory->LastItemSeen = Item;
-			PickUpInventoryItem();
-		}
+		//	CharacterInventory->LastItemSeen = Item;
+		//	PickUpInventoryItem();
+		//}
 
 	}
 }
-
-//void AInventoryCharacter::OnEndOverap(AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex)
-//{
-//}
-
